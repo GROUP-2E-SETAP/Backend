@@ -1,0 +1,31 @@
+require('dotenv').config();
+
+module.exports = {
+  port: process.env.PORT || 3000,
+  nodeEnv: process.env.NODE_ENV || 'development',
+  
+  // Database
+  mongoUri: process.env.MONGO_URI,
+  postgresUri: process.env.POSTGRES_URI,
+  
+  // JWT
+  jwtSecret: process.env.JWT_SECRET,
+  jwtExpire: process.env.JWT_EXPIRE || '7d',
+  jwtRefreshExpire: process.env.JWT_REFRESH_EXPIRE || '30d',
+  
+  // API Keys
+  aiApiKey: process.env.AI_API_KEY,
+  priceApiKey: process.env.PRICE_API_KEY,
+  mapsApiKey: process.env.MAPS_API_KEY,
+  
+  // Notifications
+  fcmServerKey: process.env.FCM_SERVER_KEY,
+  emailService: process.env.EMAIL_SERVICE,
+  emailUser: process.env.EMAIL_USER,
+  emailPassword: process.env.EMAIL_PASSWORD,
+  smsApiKey: process.env.SMS_API_KEY,
+  
+  // Rate Limiting
+  rateLimitWindowMs: 15 * 60 * 1000, // 15 minutes
+  rateLimitMaxRequests: 100
+};
