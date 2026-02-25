@@ -1,6 +1,6 @@
-require('dotenv').config();
+import 'dotenv/config'
 
-module.exports = {
+const config = {
   port: process.env.PORT || 3000,
   nodeEnv: process.env.NODE_ENV || 'development',
   
@@ -28,4 +28,7 @@ module.exports = {
   // Rate Limiting
   rateLimitWindowMs: 15 * 60 * 1000, // 15 minutes
   rateLimitMaxRequests: 100
-};
+}; 
+
+
+export default config ; 

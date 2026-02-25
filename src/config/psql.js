@@ -1,7 +1,8 @@
 import 'dotenv/config'
 import { neon } from '@neondatabase/serverless' 
+import config from "./index.js"
 
-export const sql = neon(process.env.PSQL_URL) ;
+export const sql = neon(config.postgresUri) ;
 
 export async function initPSQL() {
   try {

@@ -1,11 +1,12 @@
 import 'dotenv/config' 
 import { MongoClient } from 'mongodb' 
+import config from './index.js'
 
 let nosql ; 
 
 export async function initMongoDb() {
   try {
-    const client = new MongoClient(process.env.MONGO_URL) ; 
+    const client = new MongoClient(config.mongoUri) ; 
     await client.connect() ;
 
     nosql = client.db("SFT") ; // Student Finance Tracker  
