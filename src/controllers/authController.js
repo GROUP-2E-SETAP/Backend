@@ -210,146 +210,149 @@ async function resendEmailVerification(req, res, next) {
     }
 }
 
-// Admin methods
-async function getAllUsers(req, res, next) {
-    try {
-        const { page = 1, limit = 20, search = '' } = req.query;
-        const offset = (page - 1) * limit;
-        
-        let query = 'SELECT id, email, name, role, is_email_verified, is_account_locked, created_at, last_login FROM users';
-        let countQuery = 'SELECT COUNT(*) FROM users';
-        let params = [];
-        
-        if (search) {
-            query += ' WHERE email ILIKE $1 OR name ILIKE $1';
-            countQuery += ' WHERE email ILIKE $1 OR name ILIKE $1';
-            params.push(`%${search}%`);
-        }
-        
-        query += ` ORDER BY created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
-        params.push(limit, offset);
-        
-        const { pool } = await import('../database/index.js');
-        const [usersResult, countResult] = await Promise.all([
-            pool.query(query, params),
-            pool.query(countQuery, search ? [`%${search}%`] : [])
-        ]);
-        
-        return res.status(200).json({ 
-            success: true, 
-            data: usersResult.rows,
-            pagination: {
-                page: parseInt(page),
-                limit: parseInt(limit),
-                total: parseInt(countResult.rows[0].count)
-            }
-        });
-    } catch (error) {
-        next(error);
-    }
-}
 
-async function updateUserRole(req, res, next) {
-    try {
-        const { id } = req.params;
-        const { role } = req.body;
-        
-        const validRoles = ['user', 'premium', 'admin'];
-        if (!role || !validRoles.includes(role)) {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'Invalid role. Must be one of: user, premium, admin' 
-            });
-        }
-        
-        const { pool } = await import('../database/index.js');
-        const result = await pool.query(
-            'UPDATE users SET role = $1, updated_at = NOW() WHERE id = $2 RETURNING id, email, name, role',
-            [role, id]
-        );
-        
-        if (result.rows.length === 0) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'User not found' 
-            });
-        }
-        
-        return res.status(200).json({ 
-            success: true, 
-            message: 'User role updated successfully',
-            data: result.rows[0]
-        });
-    } catch (error) {
-        next(error);
-    }
-}
+// Admin methods needs to refactor based on updated sql
 
-async function lockUser(req, res, next) {
-    try {
-        const { id } = req.params;
-        const { locked, lockDuration = 24 } = req.body; // lockDuration in hours
-        
-        if (typeof locked !== 'boolean') {
-            return res.status(400).json({ 
-                success: false, 
-                message: 'locked field must be a boolean' 
-            });
-        }
-        
-        const { pool } = await import('../database/index.js');
-        let query, params;
-        
-        if (locked) {
-            const lockUntil = new Date(Date.now() + lockDuration * 60 * 60 * 1000);
-            query = 'UPDATE users SET is_account_locked = true, locked_until = $1, updated_at = NOW() WHERE id = $2 RETURNING id, email, is_account_locked, locked_until';
-            params = [lockUntil, id];
-        } else {
-            query = 'UPDATE users SET is_account_locked = false, locked_until = NULL, failed_login_attempts = 0, updated_at = NOW() WHERE id = $1 RETURNING id, email, is_account_locked, locked_until';
-            params = [id];
-        }
-        
-        const result = await pool.query(query, params);
-        
-        if (result.rows.length === 0) {
-            return res.status(404).json({ 
-                success: false, 
-                message: 'User not found' 
-            });
-        }
-        
-        return res.status(200).json({ 
-            success: true, 
-            message: `User ${locked ? 'locked' : 'unlocked'} successfully`,
-            data: result.rows[0]
-        });
-    } catch (error) {
-        next(error);
-    }
-}
-
-async function getPremiumContent(req, res, next) {
-    try {
-        // This is a placeholder for premium content
-        // You can customize this based on your application's needs
-        return res.status(200).json({ 
-            success: true, 
-            message: 'Premium content access granted',
-            data: {
-                features: [
-                    'Advanced quiz analytics',
-                    'Unlimited quiz attempts',
-                    'Download study materials',
-                    'Priority support',
-                    'Ad-free experience'
-                ]
-            }
-        });
-    } catch (error) {
-        next(error);
-    }
-}
-
+// // Admin methods
+// async function getAllUsers(req, res, next) {
+//     try {
+//         const { page = 1, limit = 20, search = '' } = req.query;
+//         const offset = (page - 1) * limit;
+//
+//         let query = 'SELECT id, email, name, role, is_email_verified, is_account_locked, created_at, last_login FROM users';
+//         let countQuery = 'SELECT COUNT(*) FROM users';
+//         let params = [];
+//
+//         if (search) {
+//             query += ' WHERE email ILIKE $1 OR name ILIKE $1';
+//             countQuery += ' WHERE email ILIKE $1 OR name ILIKE $1';
+//             params.push(`%${search}%`);
+//         }
+//
+//         query += ` ORDER BY created_at DESC LIMIT $${params.length + 1} OFFSET $${params.length + 2}`;
+//         params.push(limit, offset);
+//
+//         const { pool } = await import('../database/index.js');
+//         const [usersResult, countResult] = await Promise.all([
+//             pool.query(query, params),
+//             pool.query(countQuery, search ? [`%${search}%`] : [])
+//         ]);
+//
+//         return res.status(200).json({ 
+//             success: true, 
+//             data: usersResult.rows,
+//             pagination: {
+//                 page: parseInt(page),
+//                 limit: parseInt(limit),
+//                 total: parseInt(countResult.rows[0].count)
+//             }
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// }
+//
+// async function updateUserRole(req, res, next) {
+//     try {
+//         const { id } = req.params;
+//         const { role } = req.body;
+//
+//         const validRoles = ['user', 'premium', 'admin'];
+//         if (!role || !validRoles.includes(role)) {
+//             return res.status(400).json({ 
+//                 success: false, 
+//                 message: 'Invalid role. Must be one of: user, premium, admin' 
+//             });
+//         }
+//
+//         const { pool } = await import('../database/index.js');
+//         const result = await pool.query(
+//             'UPDATE users SET role = $1, updated_at = NOW() WHERE id = $2 RETURNING id, email, name, role',
+//             [role, id]
+//         );
+//
+//         if (result.rows.length === 0) {
+//             return res.status(404).json({ 
+//                 success: false, 
+//                 message: 'User not found' 
+//             });
+//         }
+//
+//         return res.status(200).json({ 
+//             success: true, 
+//             message: 'User role updated successfully',
+//             data: result.rows[0]
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// }
+//
+// async function lockUser(req, res, next) {
+//     try {
+//         const { id } = req.params;
+//         const { locked, lockDuration = 24 } = req.body; // lockDuration in hours
+//
+//         if (typeof locked !== 'boolean') {
+//             return res.status(400).json({ 
+//                 success: false, 
+//                 message: 'locked field must be a boolean' 
+//             });
+//         }
+//
+//         const { pool } = await import('../database/index.js');
+//         let query, params;
+//
+//         if (locked) {
+//             const lockUntil = new Date(Date.now() + lockDuration * 60 * 60 * 1000);
+//             query = 'UPDATE users SET is_account_locked = true, locked_until = $1, updated_at = NOW() WHERE id = $2 RETURNING id, email, is_account_locked, locked_until';
+//             params = [lockUntil, id];
+//         } else {
+//             query = 'UPDATE users SET is_account_locked = false, locked_until = NULL, failed_login_attempts = 0, updated_at = NOW() WHERE id = $1 RETURNING id, email, is_account_locked, locked_until';
+//             params = [id];
+//         }
+//
+//         const result = await pool.query(query, params);
+//
+//         if (result.rows.length === 0) {
+//             return res.status(404).json({ 
+//                 success: false, 
+//                 message: 'User not found' 
+//             });
+//         }
+//
+//         return res.status(200).json({ 
+//             success: true, 
+//             message: `User ${locked ? 'locked' : 'unlocked'} successfully`,
+//             data: result.rows[0]
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// }
+//
+// async function getPremiumContent(req, res, next) {
+//     try {
+//         // This is a placeholder for premium content
+//         // You can customize this based on your application's needs
+//         return res.status(200).json({ 
+//             success: true, 
+//             message: 'Premium content access granted',
+//             data: {
+//                 features: [
+//                     'Advanced quiz analytics',
+//                     'Unlimited quiz attempts',
+//                     'Download study materials',
+//                     'Priority support',
+//                     'Ad-free experience'
+//                 ]
+//             }
+//         });
+//     } catch (error) {
+//         next(error);
+//     }
+// }
+//
 export {
     signup,
     login,
