@@ -212,6 +212,7 @@ async function resendEmailVerification(req, res, next) {
 
 
 // Admin methods needs to refactor based on updated sql
+// Prolly add its own controllers and service instead of being with auth 
 
 // // Admin methods
 // async function getAllUsers(req, res, next) {
