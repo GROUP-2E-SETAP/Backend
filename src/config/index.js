@@ -9,9 +9,9 @@ const config = {
   postgresUri: process.env.POSTGRES_URI,
   
   // JWT
-  jwtSecret: process.env.JWT_SECRET,
-  jwtExpire: process.env.JWT_EXPIRE || '7d',
-  jwtRefreshExpire: process.env.JWT_REFRESH_EXPIRE || '30d',
+  jwtSecret: process.env.JWT_SECRET || 'change_this_secret',
+  jwtExpire: process.env.JWT_EXPIRE || '15m',
+  jwtRefreshExpire: process.env.JWT_REFRESH_EXPIRE || '7d',
   
   // API Keys
   aiApiKey: process.env.AI_API_KEY,
