@@ -30,7 +30,7 @@ async function storeRefreshToken(userId, token) {
 // Helper: Get refresh token from database
 async function getRefreshToken(userId, token) {
   const result = await sql ` SELECT * FROM refresh_tokens WHERE user_id = ${userId} AND token = ${token} AND expires_at > NOW() AND revoked = false`;
-  result result[0] || null ; 
+  return result[0] || null ; 
 }
 
 // Helper: Revoke old refresh token and store new one

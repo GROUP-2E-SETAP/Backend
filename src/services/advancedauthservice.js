@@ -10,7 +10,7 @@ import config from "../config/index.js"
 const JWT_SECRET = config.jwtSecret ; 
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'change_this_refresh_secret'; // didnt see this in the file though 
 const JWT_EXPIRES = config.jwtExpire ;
-const JWT_REFRESH_EXPIRES = config.jwtRefreshExpire:;
+const JWT_REFRESH_EXPIRES = config.jwtRefreshExpire;
 
 // Redis client (optional - fallback to database if not available)
 let redisClient = null;
@@ -59,7 +59,7 @@ class AdvancedAuthService {
 
             const result = await sql` SELECT * FROM email_verification_tokens WHERE token = ${token} AND expires_at > NOW()`;  
           
-            const verification = result.rows[0];
+            const verification = result[0];
             if (!verification) {
                 throw new Error('Invalid or expired verification token');
             }
