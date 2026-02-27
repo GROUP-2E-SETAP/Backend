@@ -62,14 +62,6 @@ app.get('/api/v1', (req, res) => {
     message: 'SETAP Finance API v1',
     endpoints: {
       auth: '/api/v1/auth',
-      transactions: '/api/v1/transactions',
-      budgets: '/api/v1/budgets',
-      categories: '/api/v1/categories',
-      dashboard: '/api/v1/dashboard',
-      notifications: '/api/v1/notifications',
-      gamification: '/api/v1/gamification',
-      predictions: '/api/v1/predictions',
-      priceComparison: '/api/v1/price-comparison'
     }
   });
 });
