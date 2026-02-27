@@ -1,7 +1,7 @@
 import crypto from 'crypto';
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import { User } from '../models/index.js';
+import { User } from '../models/index.js';    //  this would be psql one 
 import { pool } from '../database/index.js';
 import { sendPasswordResetEmail, sendEmailVerification } from './emailService.js';
 
