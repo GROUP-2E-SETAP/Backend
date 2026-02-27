@@ -1,9 +1,9 @@
-const jwt = require('jsonwebtoken');
-const User = require('../models/User');
-const { ApiError } = require('../utils/apiError');
-const config = require('../config');
+import jwt from 'jsonwebtoken' 
+import User from "../models/User.js" 
+import ApiError from '../utils/apiError.js' 
+import config from '../config/index.js' 
 
-exports.protect = async (req, res, next) => {
+export const protect = async (req, res, next) => {
   try {
     let token;
 
@@ -36,7 +36,7 @@ exports.protect = async (req, res, next) => {
   }
 };
 
-exports.authorize = (...roles) => {
+export const authorize = (...roles) => {
   return (req, res, next) => {
     if (!roles.includes(req.user.role)) {
       return next(

@@ -1,4 +1,4 @@
-const { ApiError } = require('../utils/apiError');
+import { ApiError } from '../utils/apiError.js'
 
 const errorHandler = (err, req, res, next) => {
   let error = { ...err };
@@ -7,16 +7,17 @@ const errorHandler = (err, req, res, next) => {
   // Log error for debugging
   console.error(err);
 
-  // Mongoose bad ObjectId
-  if (err.name === 'CastError') {
-    const message = 'Resource not found';
-    error = new ApiError(404, message);
-  }
+  // Mongoose bad ObjectId -- ( removed as we are using MongoClient )
 
-  // Mongoose duplicate key
-  if (err.code === 11000) {
-    const message = 'Duplicate field value entered';
-    error = new ApiError(400, message);
+  // MongoClient duplicate key ( also handles database operation failure ) 
+  if (err.name == "MongoServerError") {
+    if (err.code === 11000){
+      const message = "Duplicate value with unique index entered" ; 
+      error = new ApiError(400,message) ; 
+    } else {
+      const message = "MongoDb database operation failed" ; 
+      error = new ApiError(500,message) ; 
+    }
   }
 
   // Mongoose validation error
@@ -43,4 +44,4 @@ const errorHandler = (err, req, res, next) => {
   });
 };
 
-module.exports = errorHandler;
+export default errorHandler ; 

@@ -9,6 +9,4 @@ export async function initPSQL() {
     // TO-DO : SQL queries 
     console.log() ; 
   } catch (error) {
-    console.log("Error while initalising PSQL client : " , error) ; 
-  }
-}
+    console.log("Error while initalising PSQL client : " , error) ; } }
