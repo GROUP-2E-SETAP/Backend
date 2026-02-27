@@ -365,9 +365,5 @@ export {
     resendEmailVerification,
     getCurrentUser,
     changePassword,
-    getAllUsers,
-    updateUserRole,
-    lockUser,
-    getPremiumContent
 };
 //Register, login, logout, refresh token, password reset

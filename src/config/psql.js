@@ -24,7 +24,8 @@ export async function initPSQL() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
-
+    ` ; 
+    await sql `
     -- Email verification tokens
     CREATE TABLE IF NOT EXISTS email_verification_tokens (
         id SERIAL PRIMARY KEY,
@@ -33,7 +34,8 @@ export async function initPSQL() {
         expires_at TIMESTAMP NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
-
+    `
+    await sql ` 
     -- Password reset tokens
     CREATE TABLE IF NOT EXISTS password_reset_tokens (
         id SERIAL PRIMARY KEY,
@@ -42,7 +44,8 @@ export async function initPSQL() {
         expires_at TIMESTAMP NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
-
+    `
+    await sql ` 
     -- Refresh tokens
     CREATE TABLE IF NOT EXISTS refresh_tokens (
         id SERIAL PRIMARY KEY,
@@ -51,16 +54,15 @@ export async function initPSQL() {
         expires_at TIMESTAMP NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
-
+    `
+    await sql ` 
     -- Token blacklist (for logout)
     CREATE TABLE IF NOT EXISTS token_blacklist (
         id SERIAL PRIMARY KEY,
         token TEXT UNIQUE NOT NULL,
         expires_at TIMESTAMP NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-
-
-`;
+    );`
+    ;
   } catch (error) {
     console.log("Error while initalising PSQL client : " , error) ; } }

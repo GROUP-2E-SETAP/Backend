@@ -1,6 +1,5 @@
 import express from 'express';
 const router = express.Router();
-
 // Import v1 routes
 import authRoutes from './v1/authRoutes.js';
 

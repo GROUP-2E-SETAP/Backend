@@ -3,7 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import crypto from 'crypto';
 import { User } from '../models/index.js';
-import { pool } from '../database/index.js';
+import { sql } from "../config/psql.js"
 
 const JWT_SECRET = process.env.JWT_SECRET || 'change_this_secret';
 const JWT_REFRESH_SECRET = process.env.JWT_REFRESH_SECRET || 'change_this_refresh_secret';
@@ -24,47 +24,29 @@ const loginSchema = Joi.object({
 // Helper: Store refresh token in database
 async function storeRefreshToken(userId, token) {
   const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 days
-  await pool.query(
-    'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)',
-    [userId, token, expiresAt]
-  );
+  await sql ` INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (${userId}, ${token}, ${expiresAt})`;
 }
 
 // Helper: Get refresh token from database
 async function getRefreshToken(userId, token) {
-  const result = await pool.query(
-    'SELECT * FROM refresh_tokens WHERE user_id = $1 AND token = $2 AND expires_at > NOW() AND revoked = false',
-    [userId, token]
-  );
-  return result.rows[0] || null;
+  const result = await sql ` SELECT * FROM refresh_tokens WHERE user_id = ${userId} AND token = ${token} AND expires_at > NOW() AND revoked = false`;
+  result result[0] || null ; 
 }
 
 // Helper: Revoke old refresh token and store new one
 async function replaceRefreshToken(userId, oldToken, newToken) {
-  const client = await pool.connect();
   try {
-    await client.query('BEGIN');
-    
     // Revoke old token
-    await client.query(
-      'UPDATE refresh_tokens SET revoked = true WHERE user_id = $1 AND token = $2',
-      [userId, oldToken]
-    );
-    
+    await sql ` UPDATE refresh_tokens SET revoked = true WHERE user_id = ${userId} AND token = ${oldToken}`;
     // Store new token
     const expiresAt = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000);
-    await client.query(
-      'INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)',
-      [userId, newToken, expiresAt]
-    );
-    
-    await client.query('COMMIT');
+    await sql `INSERT INTO refresh_tokens (user_id, token, expires_at) VALUES (${userId}, ${newToken}, ${expiresAt}) `;
+
   } catch (error) {
-    await client.query('ROLLBACK');
+    // await client.query('ROLLBACK');
     throw error;
-  } finally {
-    client.release();
-  }
+    // we should prolly add commit and rollback later 
+  } 
 }
 
 async function register(payload) {
@@ -94,11 +76,8 @@ async function register(payload) {
   // Generate email verification token
   const verificationToken = crypto.randomBytes(32).toString('hex');
   const verificationExpires = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-  await pool.query(
-    'INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)',
-    [user.id, verificationToken, verificationExpires]
-  );
   
+  await sql ` INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES (${user.id}, ${verificationToken}, ${verificationExpires})`;
   return { 
     user: { id: user.id, email: user.email, name: user.name, verificationToken }, 
     accessToken,
@@ -189,10 +168,8 @@ async function blacklistToken(token) {
     if (!decoded || !decoded.exp) return;
     
     const expiresAt = new Date(decoded.exp * 1000);
-    await pool.query(
-      'INSERT INTO token_blacklist (token, expires_at) VALUES ($1, $2) ON CONFLICT (token) DO NOTHING',
-      [token, expiresAt]
-    );
+
+    await sql ` INSERT INTO token_blacklist (token, expires_at) VALUES (${token}, ${expiresAt}) ON CONFLICT (token) DO NOTHING` ;  
   } catch (error) {
     console.error('Error blacklisting token:', error);
   }
@@ -200,10 +177,7 @@ async function blacklistToken(token) {
 
 // Revoke refresh token
 async function revokeRefreshToken(token) {
-  await pool.query(
-    'UPDATE refresh_tokens SET revoked = true WHERE token = $1',
-    [token]
-  );
+  await sql ` UPDATE refresh_tokens SET revoked = true WHERE token = ${token}`  ;
 }
 
 // Initiate password reset
@@ -218,24 +192,16 @@ async function initiatePasswordReset(email) {
   const expiresAt = new Date(Date.now() + 60 * 60 * 1000); // 1 hour
   
   // Delete any existing reset tokens for this user
-  await pool.query('DELETE FROM password_reset_tokens WHERE user_id = $1', [user.id]);
-  
+  await sql ` DELETE FROM password_reset_tokens WHERE user_id = ${user.id}`;
   // Store new reset token
-  await pool.query(
-    'INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)',
-    [user.id, resetToken, expiresAt]
-  );
-  
+  await sql ` INSERT INTO password_reset_tokens (user_id, token, expires_at) VALUES (${user.id}, ${resetToken}, ${expiresAt})`; 
   return { resetToken, email: user.email, name: user.name };
 }
 
 // Verify and reset password
 async function resetPassword(token, newPassword) {
-  const result = await pool.query(
-    'SELECT * FROM password_reset_tokens WHERE token = $1 AND expires_at > NOW() AND used = false',
-    [token]
-  );
-  
+
+  const result = await sql  ` SELECT * FROM password_reset_tokens WHERE token = ${token} AND expires_at > NOW() AND used = false`;
   const resetToken = result.rows[0];
   if (!resetToken) {
     const err = new Error('Invalid or expired reset token');
@@ -245,44 +211,25 @@ async function resetPassword(token, newPassword) {
   
   const hashedPassword = await bcrypt.hash(newPassword, 10);
   
-  const client = await pool.connect();
   try {
-    await client.query('BEGIN');
     
     // Update password
-    await client.query(
-      'UPDATE users SET password = $1, updated_at = NOW() WHERE id = $2',
-      [hashedPassword, resetToken.user_id]
-    );
-    
+
+    await sql ` UPDATE users SET password = ${hashedPassword}, updated_at = NOW() WHERE id = ${resetToken.user_id}`;
     // Mark token as used
-    await client.query(
-      'UPDATE password_reset_tokens SET used = true WHERE id = $1',
-      [resetToken.id]
-    );
-    
+
+    await sql `UPDATE password_reset_tokens SET used = true WHERE id = ${resetToken.id}`;
     // Revoke all refresh tokens for security
-    await client.query(
-      'UPDATE refresh_tokens SET revoked = true WHERE user_id = $1',
-      [resetToken.user_id]
-    );
-    
-    await client.query('COMMIT');
+
+    await sql ` UPDATE refresh_tokens SET revoked = true WHERE user_id = ${resetToken.user_id}`;
   } catch (error) {
-    await client.query('ROLLBACK');
     throw error;
-  } finally {
-    client.release();
-  }
+  } 
 }
 
 // Verify email
 async function verifyEmail(token) {
-  const result = await pool.query(
-    'SELECT * FROM email_verification_tokens WHERE token = $1 AND expires_at > NOW()',
-    [token]
-  );
-  
+  const result = await sql ` SELECT * FROM email_verification_tokens WHERE token = ${token} AND expires_at > NOW()`;
   const verificationToken = result.rows[0];
   if (!verificationToken) {
     const err = new Error('Invalid or expired verification token');
@@ -290,33 +237,20 @@ async function verifyEmail(token) {
     throw err;
   }
   
-  const client = await pool.connect();
   try {
-    await client.query('BEGIN');
     
     // Update user verification status
-    await client.query(
-      'UPDATE users SET is_email_verified = true, updated_at = NOW() WHERE id = $1',
-      [verificationToken.user_id]
-    );
-    
+
+    await sql ` update users set is_email_verified = true, updated_at = now() where id = ${verificationToken.user_id}`;
     // Delete used token
-    await client.query(
-      'DELETE FROM email_verification_tokens WHERE id = $1',
-      [verificationToken.id]
-    );
-    
-    await client.query('COMMIT');
+
+    await sql ` DELETE FROM email_verification_tokens WHERE id = ${verificationToken.id}`; 
     
     const user = await User.findById(verificationToken.user_id);
     return { user: { id: user.id, email: user.email, name: user.name } };
   } catch (error) {
-    await client.query('ROLLBACK');
     throw error;
-  } finally {
-    client.release();
-  }
-}
+  } }
 
 // Change password (for authenticated user)
 async function changePassword(userId, currentPassword, newPassword) {
