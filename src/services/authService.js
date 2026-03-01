@@ -269,16 +269,10 @@ async function changePassword(userId, currentPassword, newPassword) {
   }
   
   const hashedPassword = await bcrypt.hash(newPassword, 10);
-  await pool.query(
-    'UPDATE users SET password = $1, updated_at = NOW() WHERE id = $2',
-    [hashedPassword, userId]
-  );
-  
+   await sql `UPDATE users SET password = ${hashedPassword}, updated_at = NOW() WHERE id = ${userId} `;
+
   // Revoke all refresh tokens for security
-  await pool.query(
-    'UPDATE refresh_tokens SET revoked = true WHERE user_id = $1',
-    [userId]
-  );
+  await sql ` UPDATE refresh_tokens SET revoked = true WHERE user_id = ${userId}`;
 }
 
 // Get user by ID
@@ -292,14 +286,14 @@ async function generateVerificationToken(userId) {
   const expiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000);
   
   // Delete existing tokens
-  await pool.query('DELETE FROM email_verification_tokens WHERE user_id = $1', [userId]);
-  
+  await sql ` DELETE FROM email_verification_tokens WHERE user_id = ${userId}`;
   // Insert new token
   await pool.query(
     'INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES ($1, $2, $3)',
     [userId, token, expiresAt]
   );
-  
+
+  await sql ` INSERT INTO email_verification_tokens (user_id, token, expires_at) VALUES (${userId}, ${token}, ${expiresAt})` ;
   return token;
 }
 

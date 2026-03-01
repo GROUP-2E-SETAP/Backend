@@ -27,7 +27,13 @@ const config = {
   
   // Rate Limiting
   rateLimitWindowMs: 15 * 60 * 1000, // 15 minutes
-  rateLimitMaxRequests: 100
+  rateLimitMaxRequests: 100,
+
+  // EMAIL service 
+  EMAIL_SERVICE : process.env.EMAIL_SERVICE ||  'gmail' ,
+  EMAIL_PASSWORD : process.env.EMAIL_PASSWORD ,
+  EMAIL_USER : process.env.EMAIL_USER || 'SFT' 
+
 }; 
 
 
