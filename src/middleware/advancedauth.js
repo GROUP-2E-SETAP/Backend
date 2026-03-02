@@ -1,16 +1,14 @@
 import jwt from 'jsonwebtoken';
 import rateLimit from 'express-rate-limit';
-import { pool } from '../database/index.js';
-import dotenv from 'dotenv';
+import config from "../config/index.js"
+import { sql } from "../config/psql.js"
 
-dotenv.config();
-
-const JWT_SECRET = process.env.JWT_SECRET || 'change_this_secret';
+const JWT_SECRET = config.jwtSecret || 'change_this_secret';
 
 // Helper to check if token is blacklisted
 async function isTokenBlacklisted(token) {
   try {
-    const result = await pool.query(
+    const result = await sql(
       'SELECT * FROM token_blacklist WHERE token = $1 AND expires_at > NOW()',
       [token]
     );

@@ -1,6 +1,6 @@
-const { ApiError } = require('../utils/apiError');
+import { ApiError } from "../utils/apiError.js"
 
-exports.validateCategory = (req, res, next) => {
+export const validateCategory = (req, res, next) => {
   const { name, type } = req.body;
 
   if (!name || !type) {
@@ -14,7 +14,7 @@ exports.validateCategory = (req, res, next) => {
   next();
 };
 
-exports.validateTransaction = (req, res, next) => {
+export const validateTransaction = (req, res, next) => {
   const { category, amount, type } = req.body;
 
   if (!category || !amount || !type) {
@@ -32,7 +32,7 @@ exports.validateTransaction = (req, res, next) => {
   next();
 };
 
-exports.validateBudget = (req, res, next) => {
+export const validateBudget = (req, res, next) => {
   const { category, amount, startDate, endDate } = req.body;
 
   if (!category || !amount || !startDate || !endDate) {
@@ -53,7 +53,7 @@ exports.validateBudget = (req, res, next) => {
   next();
 };
 
-exports.validateRegistration = (req, res, next) => {
+export const validateRegistration = (req, res, next) => {
   const { name, email, password } = req.body;
 
   if (!name || !email || !password) {
@@ -72,7 +72,7 @@ exports.validateRegistration = (req, res, next) => {
   next();
 };
 
-exports.validateLogin = (req, res, next) => {
+export const validateLogin = (req, res, next) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
