@@ -67,6 +67,18 @@ CREATE TABLE IF NOT EXISTS categories (
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
+
+-- Transactions
+CREATE TABLE IF NOT EXISTS transactions ( 
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    category_id INTEGER REFERENES categories(id) ON DELETE SET NULL,
+    amount DECIMAL(12, 2) NOT NULL CHECK (type IN('income', 'expense')),
+    description TEXT,
+    transaction_date DATE DEFAULT CURRENT_DATE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 -- Budgets
 CREATE TABLE IF NOT EXISTS budgets (
     id SERIAL PRIMARY KEY,
@@ -126,6 +138,9 @@ CREATE INDEX IF NOT EXISTS idx_email_verification_token ON email_verification_to
 CREATE INDEX IF NOT EXISTS idx_password_reset_token ON password_reset_tokens(token);
 CREATE INDEX IF NOT EXISTS idx_refresh_token ON refresh_tokens(token);
 CREATE INDEX IF NOT EXISTS idx_token_blacklist ON token_blacklist(token);
+CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);
+CREATE INDEX IF NOT EXISTS idx_transactions_category_id ON transactions(category_id);
+CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(transaction_date);
 
 -- Trigger to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
