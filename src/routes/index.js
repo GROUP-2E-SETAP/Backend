@@ -1,11 +1,13 @@
 import express from 'express';
-const router = express.Router();
-// Import v1 routes
 import authRoutes from './v1/authRoutes.js';
+import categoryRoutes from './v1/categoryRoutes.js'; 
+'
+
+const router = express.Router();
 
 // Mount v1 routes
 router.use('/auth', authRoutes);
 
-// Placeholder for other routes - these need to be converted to ES6
+router.use('categories',categoryRoutes) ;
 
 export default router;
