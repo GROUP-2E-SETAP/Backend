@@ -72,8 +72,9 @@ CREATE TABLE IF NOT EXISTS categories (
 CREATE TABLE IF NOT EXISTS transactions ( 
     id SERIAL PRIMARY KEY,
     user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
-    category_id INTEGER REFERENES categories(id) ON DELETE SET NULL,
-    amount DECIMAL(12, 2) NOT NULL CHECK (type IN('income', 'expense')),
+    category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL,
+    amount DECIMAL(12, 2) NOT NULL CHECK (amount >0),
+    type VARCHAR (10) NOT NULL CHECK (type IN ('income', 'expense', 'savings')),
     description TEXT,
     transaction_date DATE DEFAULT CURRENT_DATE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -94,6 +95,23 @@ CREATE TABLE IF NOT EXISTS budgets (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
+
+
+-- Allowance
+CREATE TABLE IF NOT EXISTS allowance( 
+    id SERIAL PRIMARY KEY,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    name VARCHAR(100,2) NOT NULL,
+    amount DECIMAL(12, 2) NOT NULL CHECK (amount >0),
+    frequency VARCHAR(20) NOT NULL DEFAULT 'monthly' CHECK (period IN('daily', 'weekly','monthly','yearly'))
+    start_date DATE NOT NULL DEFAULT CURRENT_DATE,
+    end_date DATE, 
+    is_active BOOLEAN DEFAULT TRUE,
+    notes TEXT, 
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 
 -- Notifications (User preferences and history)
 CREATE TABLE IF NOT EXISTS notifications (
@@ -141,6 +159,8 @@ CREATE INDEX IF NOT EXISTS idx_token_blacklist ON token_blacklist(token);
 CREATE INDEX IF NOT EXISTS idx_transactions_user_id ON transactions(user_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_category_id ON transactions(category_id);
 CREATE INDEX IF NOT EXISTS idx_transactions_date ON transactions(transaction_date);
+CREATE INDEX IF NOT EXISTS idx_allowance_user_id ON allowances(user_id);
+CREATE INDEX IF NOT EXISTS idx_allowance_is_active ON allowances(user_id, is_active);
 
 -- Trigger to update updated_at timestamp
 CREATE OR REPLACE FUNCTION update_updated_at_column()
