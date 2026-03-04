@@ -1,5 +1,6 @@
 // Standardized response handler for consistent API responses
 
+
 class ResponseHandler {
   static success(res, data = null, message = 'Success', statusCode = 200) {
     return res.status(statusCode).json({
@@ -42,8 +43,7 @@ class ResponseHandler {
   static conflict(res, message = 'Resource conflict') {
     return this.error(res, message, 409);
   }
-
-  static validationError(res, errors) {
+static validationError(res, errors) {
     return this.badRequest(res, 'Validation failed', errors);
   }
 
