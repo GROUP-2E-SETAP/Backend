@@ -63,6 +63,19 @@ export async function initPSQL() {
         expires_at TIMESTAMP NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );`
-    ;
+
+    await sql ` 
+    CREATE TABLE IF NOT EXISTS categories (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      name VARCHAR(100) NOT NULL,
+      type VARCHAR(10) NOT NULL CHECK (type IN ('income', 'expense')),
+      icon VARCHAR(50) DEFAULT 'default',
+      color VARCHAR(7) DEFAULT '#000000',
+      is_default BOOLEAN DEFAULT FALSE,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+  )`;
+  
   } catch (error) {
     console.log("Error while initalising PSQL client : " , error) ; } }

@@ -20,7 +20,7 @@ export async function createCategory(req,res) {
 
   } catch (error) {
     console.log("Error creating category : " , error) ; 
-    return ResponseHandler.serverError(req,errors = error);
+    return ResponseHandler.serverError(res,error);
   }
 }
 
@@ -36,7 +36,7 @@ export async function getCategoryByUserId (req,res) {
 
   } catch (error) {
     console.log("Error fetching category : " , error) ; 
-    return ResponseHandler.serverError(res,errors = error); 
+    return ResponseHandler.serverError(res,error); 
   }
 }
 
@@ -53,6 +53,6 @@ export async function deleteCategory (req,res) {
     return ResponseHandler.error(res);
   } catch (error) {
     console.log("Error deleting categories : " ,error) ;
-    return ResponseHandler.serverError(res,errors = error); 
+    return ResponseHandler.serverError(res,error); 
   }
 }
