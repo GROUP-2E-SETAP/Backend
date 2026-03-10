@@ -19,14 +19,21 @@ export class User {
     return result[0];
   }
 
+  // cleaner neon equivalent 
   static async update(id, updates) {
-    const fields = Object.keys(updates).map((key, idx) => `${key} = $${idx + 2}`).join(', ');
-    const values = [id, ...Object.values(updates)];
+    const result = await sql ` 
+    UPDATE users 
+    SET ${sql(updates)}
+    WHERE id = ${id}
+    RETURNING * 
+    `;
 
-    const result = await sql ` UPDATE users SET ${fields}, updated_at = NOW() WHERE id = ${fields} RETURNING *`; 
     return result[0];
   }
 }
+
+  
+
 
 // MongoDB Models (Mongoose schemas for transactions)
 
