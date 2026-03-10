@@ -1,3 +1,6 @@
+<<<<<<< HEAD
+Routes 
+=======
 TO-DO 
 
 PSQL - table rework 
@@ -5,3 +8,4 @@ MongoDB - schema and models
 
 
 Transactions & categories - routes , controllers , services
+>>>>>>> ab1825b09cdfc2b1f4a71c591b09c06bf138c9c5
