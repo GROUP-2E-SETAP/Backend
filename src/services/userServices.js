@@ -1,4 +1,4 @@
-import bcrypt from 'bcrypejs'
+import bcrypt from 'bcryptjs'
 import { User } from '../models/index.js'
 
 const allowed_fields = ['name','email','password','phone','avatar','currency','language']
@@ -22,5 +22,8 @@ export async function updateUserService(id,updates) {
   if (invalid.length) throw new Error("Access forbidden"); 
 
   return updates ;  
+}
 
-} 
+// NOTE - auth service already has change password I added this just as a fallback 
+
+

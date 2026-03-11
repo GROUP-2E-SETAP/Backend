@@ -4,7 +4,7 @@ import { updateUserService } from '../services/userServices.js'
 
 export async function updateUser(req,res) {
   try {
-    const user_id = req.params.id ; 
+    const user_id = req.params.userId ; 
     const updates  = await updateUserService(user_id,req.body);
     
     const result = await User.update(user_id,updates) ;
