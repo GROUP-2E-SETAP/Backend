@@ -19,11 +19,19 @@ export class User {
     return result[0];
   }
 
-  // cleaner neon equivalent 
+  // Ik pretty ugly and inefficient, BUT PSQL is failing at everything else 
   static async update(id, updates) {
+
     const result = await sql ` 
     UPDATE users 
-    SET ${sql(updates)}
+    SET
+      name = COALESCE(${updates.name},name) ,
+      email = COALESCE(${updates.email},email),
+      password = COALESCE(${updates.password},password),
+      phone = COALESCE(${updates.phone},phone),
+      avatar = COALESCE(${updates.avatar},avatar) ,
+      currency = COALESCE(${updates.currency},currency) ,
+      language = COALESCE(${updates.language},language)
     WHERE id = ${id}
     RETURNING * 
     `;

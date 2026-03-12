@@ -1,37 +1,14 @@
-import { describe, expect , test , beforeAll} from 'vitest' 
+import { describe, expect , test ,send ,beforeAll} from 'vitest' 
 import request from 'supertest'
 import app from '../src/app.js'
-
-// const allowed_fields = ['name','email','password','phone','avatar','currency','language']
-//
-// export async function updateUserService(id,updates) {
-//   if (!id) throw new Error("ID required") ; 
-//
-//   const user = await User.findById(id) ;
-//
-//   if (!user) throw new Error("User not found") ;
-//
-//   if(!Object.keys(updates).length) throw new Error("No fields provided");
-//
-//   if (updates.password){
-//     updates.password = await bcrypt.hash(updates.password,10) ; 
-//   }
-//
-//   // list of keys not in allowed_fields 
-//   const invalid = Object.keys(updates).filter(key => !allowed_fields.includes(key)) ; 
-//
-//   if (invalid.length) throw new Error("Access forbidden"); 
-//
-//   return updates ;  
-//
-// }
-// for reference  
 
 const API = '/api/v1/users' ; 
 
 // for testing 
 let userId ; 
 let data ;
+
+
 const mockSignup = async () => {
   const signUpData = {
     name : "test1" , 
@@ -45,15 +22,13 @@ const mockSignup = async () => {
       headers : {"Content-Type" : "application/json"} ,
       body : JSON.stringify(signUpData) 
     }) ; 
-    
+
     data = await res.json() ; 
-    
+
   } catch (error) {
-   console.log("Test sign up erro : " , error ) ; 
-  } finally {
-    userId = data.data.id ; 
-    console.log(data);
-    console.log(userId) ; 
+   console.log("Test sign up error : " , error ) ; 
+  } finally { 
+    userId = data.data.id ;
   }
 }
 
@@ -67,17 +42,66 @@ describe(`PATCH ${API}/:userId -- updating user info `,()=>{
     .patch(`${API}/99999`)
     .expect(404)
   })
+
+  test("should not allow updating without actually providing and ID ", async () => {
+    const res = await request(app)
+    .patch(`${API}`)
+    .expect(404)
+  })
+
+  test("should update name and return success",async () => {
+    const res = await request(app)
+    .patch(`${API}/${userId}`)
+    .send({name : "newTestName"})
+    .expect(200)
+
+
+    expect(res.body.data.name).toBe("newTestName") ;
+  })
+
+  test("should update multiple fields successfully ", async () => {
+    const res = await request(app) 
+    .patch(`${API}/${userId}`)
+    .send({
+        name : "newTestName2",
+        email : "newTestEmail@gmail.com",
+        currency : "£",
+        language : "English"
+      })
+    .expect(200)
+
+    expect(res.body.data.name).toBe("newTestName2");
+    expect(res.body.data.email).toBe("newTestEmail@gmail.com");
+    expect(res.body.data.currency).toBe("£");
+    expect(res.body.data.language).toBe("English");
+  })
+
+  test("should not allow user to update forbidden fields like role",async () => {
+    const res = await request(app)
+    .patch(`${API}/${userId}`)
+    .send({role : "admin"})
+    .expect(403)
+  })
+})
+
+describe(`DELETE ${API}/:userId -- deleting user will ` , ()=>{
+  test("should reject request if user does not exist ", async () => {
+    const res = request(app)
+    .delete(`${API}/9999`)
+    .expect(404)
+  })
+
+  test("should reject request if ID is not provided",async () => {
+    const res = request(app)
+    .delete(`${API}`)
+    .expect(404)
+  })
+
+  test("should delete user created earlier and receive a status code 200", async () => {
+    const res = await request(app)
+    .delete(`${API}/${userId}`) 
+    .expect(200)
+  })
 })
 
 
-
-
-
-//
-// bad req = 400 
-// unauth 
-// forbidden 
-// notfound 
-//
-//
-// server Error =500 

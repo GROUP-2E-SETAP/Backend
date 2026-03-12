@@ -22,13 +22,14 @@ export async function updateUserService(id,updates) {
 
   if (invalid.length) throw new Error("Access forbidden"); 
 
-  return updates ;  
+  const result = await User.update(id,updates) ;
+  return result  ;  
 };
 // NOTE - auth service already has change password I added this just as a fallback 
 
 
 export async function deleteUserService (userId) {
-  if (!id) throw new Error("ID required") ; 
+  if (!userId) throw new Error("ID required") ; 
   
   const user = await User.findById(userId) ; 
   if (!user) throw new Error("User not found");

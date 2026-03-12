@@ -1,14 +1,11 @@
 import ResponseHandler from '../utils/responseHandler.js'
-import { User } from '../models/index.js' 
 import { updateUserService, deleteUserService } from '../services/userServices.js'
 
 export async function updateUser(req,res) {
   try {
     const user_id = req.params.userId ; 
-    const updates  = await updateUserService(user_id,req.body);
-    
-    const result = await User.update(user_id,updates) ;
-   
+    const result   = await updateUserService(user_id,req.body);
+    console.log(result) ; 
     if (result) return ResponseHandler.success(res,result);
   
     return ResponseHandler.error(res);
@@ -39,7 +36,7 @@ export async function deleteUser(req,res) {
     return ResponseHandler.error(res) ; 
 
   } catch (error) {
-    console.log("Error deleting user : " , user) ; 
+    console.log("Error deleting user : " , error) ; 
 
     if (error.message == "ID required") return ResponseHandler.badRequest(res,"ID required") ; 
     else if (error.message == "User not found") return ResponseHandler.notFound(res,"User not found") ;
