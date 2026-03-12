@@ -19,14 +19,29 @@ export class User {
     return result[0];
   }
 
+  // Ik pretty ugly and inefficient, BUT PSQL is failing at everything else 
   static async update(id, updates) {
-    const fields = Object.keys(updates).map((key, idx) => `${key} = $${idx + 2}`).join(', ');
-    const values = [id, ...Object.values(updates)];
 
-    const result = await sql ` UPDATE users SET ${fields}, updated_at = NOW() WHERE id = ${fields} RETURNING *`; 
+    const result = await sql ` 
+    UPDATE users 
+    SET
+      name = COALESCE(${updates.name},name) ,
+      email = COALESCE(${updates.email},email),
+      password = COALESCE(${updates.password},password),
+      phone = COALESCE(${updates.phone},phone),
+      avatar = COALESCE(${updates.avatar},avatar) ,
+      currency = COALESCE(${updates.currency},currency) ,
+      language = COALESCE(${updates.language},language)
+    WHERE id = ${id}
+    RETURNING * 
+    `;
+
     return result[0];
   }
 }
+
+  
+
 
 // MongoDB Models (Mongoose schemas for transactions)
 
