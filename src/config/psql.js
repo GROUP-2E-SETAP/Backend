@@ -103,5 +103,19 @@ export async function initPSQL() {
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       UNIQUE (user_id, category_id, period)
     )`;
+
+  await sql `
+  CREATE TABLE IF NOT EXISTS goals (
+    id SERIAL PRIMARY KEY ,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE ,
+    name VARCHAR(200) NOT NULL DEFAULT 'Savings Goal',
+    target DECIMAL(10,2) NOT NULL CHECK (target > 0 ) ,
+    current DECIMAL(10,2) NOT NULL DEFAULT 0 CHECK ( current >=0 ) ,
+    deadline TIMESTAMP NOT NULL DEFAULT (NOW() + INTERVAL '7 days'),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP 
+  ) 
+  `; 
+  
+
   } catch (error) {
     console.log("Error while initalising PSQL client : " , error) ; } }

@@ -4,6 +4,7 @@ import categoryRoutes from './v1/categoryRoutes.js';
 import transactionRoutes from './v1/transactionRoutes.js';
 import budgetRoutes from './v1/budgetRoutes.js';
 import notificationRoutes from './v1/notificationRoutes.js';
+import goalsRoutes from "./v1/goalsRoutes.js" ; 
 
 const router = express.Router();
 
@@ -17,5 +18,7 @@ router.use('/transactions', transactionRoutes);
 router.use('/budgets', budgetRoutes);
 
 router.use('/notifications', notificationRoutes);
+
+router.use('/goals',goalsRoutes);
 
 export default router;
