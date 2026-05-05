@@ -64,7 +64,8 @@ export async function initPSQL() {
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );`
 
-    await sql ` 
+    await sql`
+    -- Categories table
     CREATE TABLE IF NOT EXISTS categories (
       id SERIAL PRIMARY KEY,
       user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
@@ -75,7 +76,32 @@ export async function initPSQL() {
       is_default BOOLEAN DEFAULT FALSE,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-  )`;
-  
+    );
+
+    -- Transactions table
+    CREATE TABLE IF NOT EXISTS transactions (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      category_id INTEGER REFERENCES categories(id) ON DELETE SET NULL,
+      amount DECIMAL(12,2) NOT NULL,
+      description VARCHAR(255),
+      date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    );
+
+    -- Budgets table
+    CREATE TABLE IF NOT EXISTS budgets (
+      id SERIAL PRIMARY KEY,
+      user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+      category_id INTEGER REFERENCES categories(id) ON DELETE CASCADE,
+      amount DECIMAL(12,2) NOT NULL,
+      period VARCHAR(20) DEFAULT 'monthly' CHECK (period IN ('daily', 'weekly', 'monthly', 'yearly')),
+      start_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      end_date TIMESTAMP,
+      created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+      UNIQUE (user_id, category_id, period)
+    )`;
   } catch (error) {
     console.log("Error while initalising PSQL client : " , error) ; } }

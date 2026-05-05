@@ -27,7 +27,7 @@ export async function createCategory(req,res) {
 
 export async function getCategoryByUserId (req,res) {
   try {
-    const { userId }  = req.params.id ; 
+    const { userId }  = req.params ; 
 
     const getService = await getCat(userId) ;
 
