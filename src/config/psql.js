@@ -76,8 +76,9 @@ export async function initPSQL() {
       is_default BOOLEAN DEFAULT FALSE,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-
+    )`;
+    
+    await sql `
     -- Transactions table
     CREATE TABLE IF NOT EXISTS transactions (
       id SERIAL PRIMARY KEY,
@@ -88,8 +89,9 @@ export async function initPSQL() {
       date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
       updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-    );
-
+    );`
+    
+    await sql`
     -- Budgets table
     CREATE TABLE IF NOT EXISTS budgets (
       id SERIAL PRIMARY KEY,

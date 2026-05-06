@@ -1,4 +1,4 @@
-import { sql } from "../config/psql";
+import { sql } from "../config/psql.js";
 
 const errMessage = (operation, error) => {
   return `Error ${operation} goals data: ${error?.message ?? error}`;

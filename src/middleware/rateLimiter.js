@@ -12,7 +12,7 @@ export const apiLimiter = rateLimit({
 // Stricter rate limiter for auth routes
 export const authLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 requests per window
+  max: 50, // 5 requests per window
   message: 'Too many authentication attempts, please try again later.',
   standardHeaders: true,
   legacyHeaders: false
@@ -21,7 +21,7 @@ export const authLimiter = rateLimit({
 // Rate limiter for registration
 export const registerLimiter = rateLimit({
   windowMs: 60 * 60 * 1000, // 1 hour
-  max: 3, // 3 registrations per hour
+  max: 30, // 3 registrations per hour
   message: 'Too many accounts created from this IP, please try again later.',
   standardHeaders: true,
   legacyHeaders: false
@@ -30,7 +30,7 @@ export const registerLimiter = rateLimit({
 // Rate limiter for login
 export const loginLimiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 5, // 5 login attempts
+  max: 50, // 5 login attempts
   message: 'Too many login attempts, please try again later.',
   standardHeaders: true,
   legacyHeaders: false

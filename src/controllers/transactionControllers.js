@@ -45,7 +45,7 @@ export async function getTrxByUserId(req, res) {
 
 export async function deleteTrx(req, res) {
   try {
-    const transactionId = req.body.transactionId || req.params.transactionId;
+    const transactionId = req.body.transactionId ;
 
     if (!transactionId) return ResponseHandler.badRequest(res, "transactionId is required");
     

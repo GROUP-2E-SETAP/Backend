@@ -1,9 +1,9 @@
-import ResponseHandler from "../utils/responseHandler"
+import ResponseHandler from "../utils/responseHandler.js"
 import { 
   updateG,
   createG,
   delG
-} from "../services/goalsServices"
+} from "../services/goalsServices.js"
 
 
 export async function createGoals(req,res) {

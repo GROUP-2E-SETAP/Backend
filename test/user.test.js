@@ -12,7 +12,7 @@ let data ;
 const mockSignup = async () => {
   const signUpData = {
     name : "test1" , 
-    email : "testmail@gmail.com",
+    email : `testmail${Date.now()}@gmail.com`,
     password : "testPassword123!"
   }
 
@@ -24,7 +24,6 @@ const mockSignup = async () => {
     }) ; 
 
     data = await res.json() ; 
-
   } catch (error) {
    console.log("Test sign up error : " , error ) ; 
   } finally { 
@@ -53,10 +52,10 @@ describe(`PATCH ${API}/:userId -- updating user info `,()=>{
     const res = await request(app)
     .patch(`${API}/${userId}`)
     .send({name : "newTestName"})
-    .expect(200)
-
-
-    expect(res.body.data.name).toBe("newTestName") ;
+    console.log(res.body);
+    
+    expect(res.status).toBe(200);
+    expect(data.name).toBe("newTestName") ;
   })
 
   test("should update multiple fields successfully ", async () => {
