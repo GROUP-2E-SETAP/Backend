@@ -6,13 +6,13 @@ const API = '/api/v1/users' ;
 
 // for testing 
 let userId ; 
-let data ;
 
 
 const mockSignup = async () => {
+  let data ; 
   const signUpData = {
     name : "test1" , 
-    email : "testmail@gmail.com",
+    email : `testmail${Date.now()}@gmail.com`,
     password : "testPassword123!"
   }
 
@@ -23,10 +23,8 @@ const mockSignup = async () => {
       body : JSON.stringify(signUpData) 
     }) ; 
 
-    data = await res.json() ; 
-
+    data = await res.json() ;
   } catch (error) {
-   console.log("Test sign up error : " , error ) ; 
   } finally { 
     userId = data.data.id ;
   }
@@ -53,10 +51,10 @@ describe(`PATCH ${API}/:userId -- updating user info `,()=>{
     const res = await request(app)
     .patch(`${API}/${userId}`)
     .send({name : "newTestName"})
-    .expect(200)
-
-
-    expect(res.body.data.name).toBe("newTestName") ;
+    
+    expect(res.status).toBe(200);
+    let data = res.body; 
+    expect(data.data.name).toBe("newTestName") ;
   })
 
   test("should update multiple fields successfully ", async () => {
@@ -70,10 +68,12 @@ describe(`PATCH ${API}/:userId -- updating user info `,()=>{
       })
     .expect(200)
 
-    expect(res.body.data.name).toBe("newTestName2");
-    expect(res.body.data.email).toBe("newTestEmail@gmail.com");
-    expect(res.body.data.currency).toBe("£");
-    expect(res.body.data.language).toBe("English");
+    const data = res.body;
+
+    expect(data.data.name).toBe("newTestName2");
+    expect(data.data.email).toBe("newTestEmail@gmail.com");
+    expect(data.data.currency).toBe("£");
+    expect(data.data.language).toBe("English");
   })
 
   test("should not allow user to update forbidden fields like role",async () => {

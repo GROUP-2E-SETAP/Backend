@@ -6,6 +6,9 @@ import {
 } from '../services/notificationServices.js';
 import ResponseHandler from '../utils/responseHandler.js';
 
+
+// i dont think it should exist but i am NOT touching it 
+
 export async function addNotification(req, res) {
   try {
     const { userId, type, message } = req.body;
