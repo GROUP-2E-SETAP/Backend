@@ -1,4 +1,3 @@
-import { log } from "console";
 import { describe, it, expect } from "vitest";
 
 describe("POST /api/v1/auth/signup", () => {

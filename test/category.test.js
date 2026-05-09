@@ -1,58 +1,52 @@
-import config from '../src/config/index.js'
+import { describe, expect, test, beforeAll, afterAll } from 'vitest'
 import request from 'supertest'
-import app from '../src/app.js' 
-import { describe, expect , test } from 'vitest'
-// by far category got 3 operations - Create Read & Delete 
+import app from '../src/app.js'
 
-const API = `/api/v1/categories`;
-let categoryId ; // would be used later for delete 
+const API = '/api/v1/categories';
+let categoryId;
+let userId;
 
-// creating a category 
-describe(`POST ${API}`, () => {
-  test("should create a category for user with ID 1 ",async () => {
-    const res = await request(app)
-      .post(API)
-      .expect('Content-Type',/json/)
-      .send({
-        userId : "1",
-        catName : "Movie",
-        type : "expense"
-      }) 
-      .expect(200);
-     
-    categoryId = res.body.data.id ;
-    
-    expect(res.body.success).toBe(true);
-  })
+beforeAll(async () => {
+  const res = await request(app)
+    .post('/api/v1/auth/signup')
+    .send({
+      name: 'Category Test User',
+      email: `cattest_${Date.now()}@example.com`,
+      password: 'StrongPass123!'
+    });
+  userId = res.body.data?.id;
 });
 
+afterAll(async () => {
+  if (userId) await request(app).delete(`/api/v1/users/${userId}`);
+});
 
-// fetching categories by user id 
-
-describe(`GET ${API}/1`, () => {
-  test("Should return all categories created by user with ID : 1 ", async () => {
+describe(`POST ${API}`, () => {
+  test('should create a category successfully', async () => {
     const res = await request(app)
-      .get(`${API}/1`)
+      .post(API)
+      .send({ userId, catName: 'Movies', type: 'expense' })
       .expect(200);
+    expect(res.body.success).toBe(true);
+    categoryId = res.body.data.id;
+  });
+});
 
-    expect(res.body.success).toBe(true);  
-  })
-})
-
-
-// deleting category created during first test 
+describe(`GET ${API}/:userId`, () => {
+  test('should return all categories for a user', async () => {
+    const res = await request(app)
+      .get(`${API}/${userId}`)
+      .expect(200);
+    expect(res.body.success).toBe(true);
+  });
+});
 
 describe(`DELETE ${API}`, () => {
-  test("Should delete the category created during earlier test ", async () => {
+  test('should delete the category', async () => {
     const res = await request(app)
       .delete(API)
-      .expect('Content-Type',/json/)
-      .send({ catId : categoryId})
+      .send({ catId: categoryId })
       .expect(200);
-
     expect(res.body.success).toBe(true);
-  })
-})
-
-// NOTE : delete test fails without transaction logic as deleting a category would delete all 
-// transactions relating to that cateogry  
+  });
+});

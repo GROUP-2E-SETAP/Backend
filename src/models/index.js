@@ -20,10 +20,19 @@ export class User {
   }
 
   static async update(id, updates) {
-    const fields = Object.keys(updates).map((key, idx) => `${key} = $${idx + 2}`).join(', ');
-    const values = [id, ...Object.values(updates)];
-
-    const result = await sql ` UPDATE users SET ${fields}, updated_at = NOW() WHERE id = ${fields} RETURNING *`; 
+    const result = await sql`
+      UPDATE users SET
+        name     = COALESCE(${updates.name     ?? null}, name),
+        email    = COALESCE(${updates.email    ?? null}, email),
+        phone    = COALESCE(${updates.phone    ?? null}, phone),
+        avatar   = COALESCE(${updates.avatar   ?? null}, avatar),
+        currency = COALESCE(${updates.currency ?? null}, currency),
+        language = COALESCE(${updates.language ?? null}, language),
+        password = COALESCE(${updates.password ?? null}, password),
+        updated_at = NOW()
+      WHERE id = ${id}
+      RETURNING *
+    `;
     return result[0];
   }
 }

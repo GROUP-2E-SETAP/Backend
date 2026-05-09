@@ -35,8 +35,11 @@ export async function getBudgets(req, res) {
 
     const budgets = await getBudgetsByUserId(userId);
 
-    if (budgets) return ResponseHandler.success(res, budgets);
-    return res.status(400).json("Error fetching budgets");
+    if (budgets) {
+      return ResponseHandler.success(res, budgets);
+    } else {
+      return ResponseHandler.notFound(res,"budgets not found ");
+    }
 
   } catch (error) {
     console.log("Error fetching budgets: ", error);
@@ -54,9 +57,12 @@ export async function updateExistingBudget(req, res) {
     }
 
     const updatedBudget = await updateBudget(budgetId, amount);
-
-    if (updatedBudget) return ResponseHandler.success(res, updatedBudget);
-    return ResponseHandler.error(res, "Budget not found or could not be updated");
+    console.log(updateBudget);
+    if (updatedBudget) {
+      return ResponseHandler.success(res, updatedBudget);
+    } else{
+      return ResponseHandler.notFound(res, "Budget not found or could not be updated");
+    }
 
   } catch (error) {
     console.log("Error updating budget: ", error);
@@ -71,10 +77,13 @@ export async function removeBudget(req, res) {
     if (!budgetId) return ResponseHandler.badRequest(res, "budgetId is required");
     
     const deletedBudget = await deleteBudget(budgetId);
-
-    if (deletedBudget) return ResponseHandler.success(res, deletedBudget);
+    console.log(deleteBudget);
+    if (deletedBudget){
+      return ResponseHandler.success(res, deletedBudget);
+    }else {
+      return ResponseHandler.notFound(res, "Budget not found or could not be deleted");
+    } 
    
-    return ResponseHandler.error(res, "Budget not found or could not be deleted");
   } catch (error) {
     console.log("Error deleting budget: ", error);
     return ResponseHandler.serverError(res, error);
