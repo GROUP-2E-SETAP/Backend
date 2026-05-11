@@ -1,3 +1,14 @@
 .env
 
 node_modules/
+
+
+coverage/  
+
+
+*.md 
+
+
+vitest.config.js
+
+package-lock.json
