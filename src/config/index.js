@@ -32,7 +32,9 @@ const config = {
   // EMAIL service 
   EMAIL_SERVICE : process.env.EMAIL_SERVICE ||  'gmail' ,
   EMAIL_PASSWORD : process.env.EMAIL_PASSWORD ,
-  EMAIL_USER : process.env.EMAIL_USER || 'SFT' 
+  EMAIL_USER : process.env.EMAIL_USER || 'SFT' ,
+
+  ML_URI : process.env.ML_MODEL_URI 
 
 }; 
 
