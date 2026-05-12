@@ -52,6 +52,7 @@ export async function initPSQL() {
         user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
         token TEXT UNIQUE NOT NULL,
         expires_at TIMESTAMP NOT NULL,
+        revoked BOOLEAN DEFAULT FALSE ,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
     );
     `

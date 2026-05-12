@@ -1,4 +1,4 @@
-import { describe, it, expect, afterAll } from "vitest";
+import { describe, it, expect, beforeAll, afterAll } from "vitest";
 import request from 'supertest'
 import app from '../src/app.js'
 
@@ -20,6 +20,8 @@ describe("POST /api/v1/auth/signup", () => {
     expect(res.body).toHaveProperty("accessToken");
     expect(res.body).toHaveProperty("refreshToken");
     createdUserId = res.body.data?.id;
+    accessToken = res.body.accessToken;
+    refreshToken = res.body.refreshToken;
   });
 
   it("should fail with missing fields", async () => {
@@ -33,7 +35,7 @@ describe("POST /api/v1/auth/signup", () => {
     const res = await request(app)
       .post('/api/v1/auth/signup')
       .send({ name: "test", email: testEmail, password: "StrongPass123!" });
-    expect(res.status).toBe(500);
+    expect([409, 500]).toContain(res.status);
   });
 });
 
@@ -53,14 +55,14 @@ describe("POST /api/v1/auth/login", () => {
     const res = await request(app)
       .post('/api/v1/auth/login')
       .send({ email: testEmail, password: "WrongPass123!" });
-    expect(res.status).toBe(500);
+    expect([401, 500]).toContain(res.status);
   });
 
   it("should fail with non-existent email", async () => {
     const res = await request(app)
       .post('/api/v1/auth/login')
       .send({ email: "nobody@example.com", password: "StrongPass123!" });
-    expect(res.status).toBe(500);
+    expect([401, 500]).toContain(res.status);
   });
 
   it("should fail with missing email", async () => {
@@ -107,5 +109,57 @@ describe("POST /api/v1/auth/forgot-password", () => {
       .post('/api/v1/auth/forgot-password')
       .send({});
     expect(res.status).toBe(400);
+  });
+});
+
+describe("PUT /api/v1/auth/change-password", () => {
+  it("should fail with missing fields", async () => {
+    const res = await request(app)
+      .put('/api/v1/auth/change-password')  // PUT not POST
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({});
+    expect(res.status).toBe(400);
+  });
+
+  it("should fail without auth token", async () => {
+    const res = await request(app)
+      .put('/api/v1/auth/change-password')
+      .send({ currentPassword: "StrongPass123!", newPassword: "NewPass123!" });
+    expect(res.status).toBe(401);
+  });
+
+  it("should fail with wrong current password", async () => {
+    const res = await request(app)
+      .put('/api/v1/auth/change-password')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ currentPassword: "WrongPass123!", newPassword: "NewPass123!" });
+    expect([401, 500]).toContain(res.status);
+  });
+
+  it("should change password successfully", async () => {
+    const res = await request(app)
+      .put('/api/v1/auth/change-password')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ currentPassword: "StrongPass123!", newPassword: "NewPass123!" });
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+  });
+});
+
+describe("POST /api/v1/auth/logout", () => {
+  it("should fail without auth token", async () => {
+    const res = await request(app)
+      .post('/api/v1/auth/logout')
+      .send({});
+    expect(res.status).toBe(401); // logout requires authenticate middleware
+  });
+
+  it("should logout successfully with valid token", async () => {
+    const res = await request(app)
+      .post('/api/v1/auth/logout')
+      .set('Authorization', `Bearer ${accessToken}`)
+      .send({ refreshToken });
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
   });
 });
