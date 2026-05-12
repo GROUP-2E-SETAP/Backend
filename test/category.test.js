@@ -1,6 +1,7 @@
 import { describe, expect, test, beforeAll, afterAll } from 'vitest'
 import request from 'supertest'
 import app from '../src/app.js'
+import { response } from 'express';
 
 const API = '/api/v1/categories';
 let categoryId;
@@ -30,6 +31,28 @@ describe(`POST ${API}`, () => {
     expect(res.body.success).toBe(true);
     categoryId = res.body.data.id;
   });
+
+  test('should fail if userId is missing', async () => {
+    const res = await request(app)
+      .post(API)
+      .send({ catName: 'Movies', type: 'expense' })
+      .expect(400);
+  });
+
+  test('should fail if catName is missing', async () => {
+    const res = await request(app)
+      .post(API)
+      .send({ userId, type: 'expense' })
+      .expect(400);
+  });
+
+  test('should fail if type is missing', async () => {
+    const res = await request(app)
+      .post(API)
+      .send({ userId, catName: 'Movies' })
+      .expect(400);
+  });
+
 });
 
 describe(`GET ${API}/:userId`, () => {
@@ -39,6 +62,14 @@ describe(`GET ${API}/:userId`, () => {
       .expect(200);
     expect(res.body.success).toBe(true);
   });
+
+  test('should return empty or success for user with no categories', async () => {
+    const res = await request(app)
+      .get(`${API}/99999`)
+      .expect(200);
+    expect(res.body.success).toBe(true);
+  });
+
 });
 
 describe(`DELETE ${API}`, () => {
@@ -49,4 +80,14 @@ describe(`DELETE ${API}`, () => {
       .expect(200);
     expect(res.body.success).toBe(true);
   });
+
+  test('should fail if catId is missing ', async()=>{
+    const rest = await request(app)
+    .delete(API)
+    .send({})
+    .expect([400,404,500])
+  });
+
+
+
 });

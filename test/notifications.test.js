@@ -70,6 +70,22 @@ describe('GET /notifications/:userId -- fetching notifications', () => {
   });
 });
 
+describe('PUT /notifications/:notificationId -- markinga a notifications ' , ()=>{
+
+  test('should mark notification as read successfully', async () => {
+    const res = await request(app)
+      .put(`/api/v1/notifications/${notificationId}/read`);
+    expect(res.status).toBe(200);
+    expect(res.body.success).toBe(true);
+  });
+
+  test('should fail with non existend notificationId ', async () =>{
+    const res = await request(app)
+      .put('/api/v1/notifications/99999/read');
+    expect([400, 404, 500]).toContain(res.status);
+  });
+});
+
 describe('DELETE /notifications/:notificationId -- deleting a notification', () => {
   test('should reject if notification does not exist', async () => {
     const res = await request(app).delete('/api/v1/notifications/99999');

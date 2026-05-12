@@ -41,6 +41,13 @@ describe(`PATCH ${API}/:userId -- updating user info `,()=>{
     .expect(404)
   })
 
+  test('should not allow update without any fields' ,async ()=>{
+    const res = await request(app)
+    .patch(`${API}/${userId}`)
+    .send({})
+    .expect([400,500])
+  });
+
   test("should not allow updating without actually providing and ID ", async () => {
     const res = await request(app)
     .patch(`${API}`)
@@ -86,13 +93,13 @@ describe(`PATCH ${API}/:userId -- updating user info `,()=>{
 
 describe(`DELETE ${API}/:userId -- deleting user will ` , ()=>{
   test("should reject request if user does not exist ", async () => {
-    const res = request(app)
+    const res = await request(app)
     .delete(`${API}/9999`)
     .expect(404)
   })
 
   test("should reject request if ID is not provided",async () => {
-    const res = request(app)
+    const res = await request(app)
     .delete(`${API}`)
     .expect(404)
   })

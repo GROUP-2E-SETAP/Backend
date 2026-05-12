@@ -32,6 +32,8 @@ describe("Transactions API", () => {
       const res = await request(app)
         .post('/api/v1/transactions')
         .send({ userId: testUserId, categoryId: testCategoryId, amount: 100, description: "test transaction" });
+      console.log(res.body.data); 
+      console.log(res.body); 
       expect(res.status).toBe(200);
       expect(res.body.data.user_id).toBe(testUserId);
       expect(res.body.data.amount).toBe('100.00');
