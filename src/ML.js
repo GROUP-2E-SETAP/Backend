@@ -1,6 +1,7 @@
 import axios from "axios";
 import { getTrxModal } from "./models/transactionModals.js";
 import config from "./config/index.js"; 
+import { createNotification } from "./services/notificationServices.js";
 
 
 const ML_URI = config.ML_URI;
@@ -26,7 +27,9 @@ export default async function triggerMLAnalysis(userId) {
     };
 
     const response = await axios.post(`${ML_URI}/predict`, payload);
-    console.log(response.data);
+    const message = response.data;
+
+    createNotification(userId,"Budget Prediction and Health",message);
 
   } catch (error) {
   if (error.response) {
