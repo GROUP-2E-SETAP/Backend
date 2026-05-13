@@ -1,6 +1,6 @@
-import { sql } from "../config/psql"
-import {  getNotificationsByUserId } from "../services/notificationServices";
-import { getNoSql } from "../config/mongoDb";
+import { sql } from "../config/psql.js"
+import {  getNotificationsByUserId } from "../services/notificationServices.js";
+import { getNoSql } from "../config/mongoDb.js";
 import nodemailer from "nodemailer";
 import config from "../config/index.js";
 import cron from "node-cron";
