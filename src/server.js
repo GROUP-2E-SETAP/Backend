@@ -2,6 +2,7 @@ import express from 'express';
 import dotenv from 'dotenv';
 import { initPSQL } from './config/psql.js';
 import { initMongoDb } from './config/mongoDb.js';
+import './cron/notificationCron.js'; 
 
 // Load environment variables
 dotenv.config();
@@ -30,6 +31,7 @@ const startServer = async () => {
     process.exit(1);
   }
 };
+
 
 // Handle graceful shutdown
 process.on('SIGTERM', () => {

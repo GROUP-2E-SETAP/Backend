@@ -28,7 +28,7 @@ export async function getNotificationsByUserId(userId) {
     const db = getNoSql();
     
     const notifications = await db.collection(COLLECTION)
-      .find({ userId })
+      .find({ userId , isRead : false})
       .sort({ createdAt: -1 })
       .toArray();
       
